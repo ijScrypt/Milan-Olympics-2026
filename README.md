@@ -1,7 +1,6 @@
 <div align="center">
 
 # Milano 2026: NoSQL Analytics Dashboard
-**Technical Guide & Documentation**
 
 ![University Logo](screenshots/university_logo.png) 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
@@ -14,116 +13,107 @@
 
 ## Demo
 
-
-
 https://github.com/user-attachments/assets/f26d1df0-c75f-4d38-b9db-68bb1854df22
-</div>
 
 ---
 
-## Overview
+## Prérequis
 
-This repository contains a full-stack analytics platform designed to analyze social media activity for the **Milano-Cortina 2026 Winter Olympics**. It leverages **MongoDB** for high-volume document storage and **Neo4j** for complex relationship mapping and graph traversal.
-
----
-
-## Prerequisites
-
-Ensure you have the following installed and running on your local machine:
+Assurez-vous que les éléments suivants sont installés et en cours d'exécution sur votre machine :
 
 1.  **Python 3.8+**
-2.  **MongoDB Community Server** (Running on port `27017`)
-3.  **Neo4j Browser/Desktop** (Running on Bolt port `7687`)
+2.  **Serveur MongoDB** (Port par défaut : `27017`)
+3.  **Neo4j Desktop ou Server** (Port Bolt par défaut : `7687`)
 
 ---
 
-## Installation & Setup
+## Installation et Configuration
 
-### 1. Clone & Environment
-Clone this repository and set up a Python virtual environment:
+### 1. Clonage et Environnement
+Clonez le dépôt et configurez un environnement virtuel Python :
 
 ```bash
-# Create virtual environment
+# Créer l'environnement virtuel
 python -m venv venv
 
-# Activate virtual environment
-# On Windows:
+# Activer l'environnement virtuel
+# Sous Windows :
 venv\Scripts\activate
-# On Unix or MacOS:
+# Sous Unix ou MacOS :
 source venv/bin/activate
 ```
 
-### 2. Install Dependencies
-Install all required libraries for the Flask backend and data processing:
+### 2. Installation des Dépendances
+Installez toutes les bibliothèques requises pour le backend Flask et le traitement des données :
 
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Configuration
-Create a `.env` file in the root directory and configure your database credentials:
+Créez un fichier `.env` à la racine du projet et configurez vos identifiants de base de données :
 
 ```env
 MONGO_URI=mongodb://localhost:27017
 MONGO_DB_NAME=milano2026
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=your_password
+NEO4J_PASSWORD=votre_mot_de_passe
 ```
 
 ---
 
-## Database Initialization (Seeding)
+## Initialisation de la Base de Données (Seeding)
 
-The application requires initial data to populate the charts and relationship graphs.
+L'application nécessite des données initiales pour alimenter les graphiques et les relations.
 
-*   **Automatic Seeding**: Upon running the backend (`api.py`) for the first time, the system will check if MongoDB is empty. If it is, it will automatically generate ~30 users and ~200 tweets using the `SeedService`.
-*   **Manual Re-seed**: You can trigger a full database refresh directly from the Dashboard UI using the **"Re-seed"** button in the top navigation bar.
+*   **Seeding Automatique** : Lors du premier lancement du backend (`api.py`), le système vérifie si MongoDB est vide. Si c'est le cas, il générera automatiquement environ 30 utilisateurs et 200 tweets via le `SeedService`.
+*   **Re-seed Manuel** : Vous pouvez déclencher une réinitialisation complète des données directement depuis l'interface du Dashboard via le bouton **"Re-seed"** dans la barre de navigation.
 
 ---
 
-## Running the Application
+## Lancement de l'Application
 
-Follow these steps to launch the dashboard:
+Suivez ces étapes pour lancer le dashboard :
 
-### Step 1: Start the Backend API
-The Flask server handles database connections and executes the NoSQL queries.
+### Étape 1 : Démarrer l'API Backend
+Le serveur Flask gère les connexions aux bases de données et exécute les requêtes NoSQL.
 
 ```bash
 python api.py
 ```
 > [!TIP]
-> The API will run at `http://127.0.0.1:5000/api`.
+> L'API sera accessible sur `http://127.0.0.1:5000/api`.
 
-### Step 2: Open the Dashboard
-The frontend is built with pure HTML/JS/CSS. Since it's a standalone client:
+### Étape 2 : Ouvrir le Dashboard
+Le frontend est construit en HTML/JS/CSS pur. Comme il s'agit d'un client autonome :
 
-1.  Locate `dashboard.html` in the root folder.
-2.  Open it directly in your web browser (Chrome, Edge, or Firefox recommended).
-3.  Ensure the top-right status indicator shows **"Connecté"**.
+1.  Localisez le fichier `dashboard.html` dans le dossier racine.
+2.  Ouvrez-le directement dans votre navigateur Web (Chrome, Edge ou Firefox recommandé).
+3.  Vérifiez que l'indicateur d'état en haut à droite affiche **"Connecté"**.
 
 ---
 
-## Project Structure
+## Structure du Projet
 
-| File | Description |
+| Fichier | Description |
 | :--- | :--- |
-| `api.py` | **Main Entry Point**. Flask REST API exposing all endpoints. |
-| `dashboard.html` | The main UI container for the analytics platform. |
-| `services_mongo.py` | Business logic for all MongoDB aggregations and CRUD operations. |
-| `services_neo4j.py` | Logic for relationship imports and complex Cypher queries. |
-| `seed.py` | Data generation engine using the `Faker` library. |
-| `config.py` | Environment variable management and global settings. |
+| `api.py` | **Point d'entrée principal**. API REST Flask exposant tous les points de terminaison. |
+| `dashboard.html` | Conteneur principal de l'interface utilisateur pour la plateforme d'analyse. |
+| `services_mongo.py` | Logique métier pour toutes les agrégations MongoDB et les opérations CRUD. |
+| `services_neo4j.py` | Logique pour l'import des relations et les requêtes Cypher complexes. |
+| `seed.py` | Moteur de génération de données utilisant la bibliothèque `Faker`. |
+| `config.py` | Gestion des variables d'environnement et paramètres globaux. |
 
 ---
 
-## Available Functions
-*   **KPI Dashboard**: Real-time counters for users, tweets, and trending tags.
-*   **Network Graphs**: Interactive visualization of followers, retweets, and conversation threads using `vis-network`.
-*   **NoSQL Query Engine**: Dedicated tab to execute 16 specific analytical queries across both database engines.
-*   **CRUD Management**: Direct interface to Create, Read, Update, and Delete documents and users.
+## Fonctionnalités Disponibles
+*   **Tableau de bord KPI** : Compteurs en temps réel pour les utilisateurs, les tweets et les tags populaires.
+*   **Graphes de Réseau** : Visualisation interactive des followers, retweets et fils de discussion via `vis-network`.
+*   **Moteur de Requêtes NoSQL** : Onglet dédié pour exécuter 16 requêtes analytiques spécifiques sur les deux moteurs de base de données.
+*   **Gestion CRUD** : Interface directe pour Créer, Lire, Mettre à jour et Supprimer des documents et des utilisateurs.
 
 ---
 <div align="center">
-  <i>Technical Readme - Milano 2026 NoSQL Project</i>
+  <i>Technical Readme - Projet NoSQL Milano 2026</i>
 </div>
