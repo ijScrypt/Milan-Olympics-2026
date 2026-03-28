@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milano 2026 - Dashboard NoSQL</title>
+    <meta name="description" content="Dashboard KPI pour le projet NoSQL JO Milano 2026 - MongoDB and Neo4j">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://unpkg.com/vis-network/styles/vis-network.min.css" type="text/css" />
+</head>
+
+<body>
+    <!-- --- Animated Background --- -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow--1"></div>
+    <div class="bg-glow bg-glow--2"></div>
+    <div class="bg-glow bg-glow--3"></div>
+
+    <!-- --- Top Navigation --- -->
+    <nav id="topnav" class="topnav">
+        <div class="topnav__brand">
+            <div class="topnav__logo">
+                <svg viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" stroke="url(#grad)" stroke-width="2.5" />
+                    <circle cx="16" cy="16" r="6" fill="url(#grad)" />
+                    <defs>
+                        <linearGradient id="grad" x1="0" y1="0" x2="32" y2="32">
+                            <stop stop-color="#6366f1" />
+                            <stop offset="1" stop-color="#06b6d4" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <span class="topnav__title">Milano 2026</span>
+            <span class="topnav__badge">Social Analytics</span>
+        </div>
+        <div class="topnav__actions">
+            <button id="btn-seed" class="btn btn--ghost" title="Re-seeder la base">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6" />
+                    <path d="M1 20v-6h6" />
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+                <span>Re-seed</span>
+            </button>
+            <div class="topnav__status" id="connection-status">
+                <span class="status-dot status-dot--checking"></span>
+                <span class="status-text">Connexion...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- --- Main Tabs --- -->
+    <div class="db-tabs" id="main-tabs">
+        <button class="db-tab db-tab--active" data-tab="kpi" id="tab-kpi">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M3 3h18v2H3V3zm4 4h10v2H7V7zm-4 4h18v2H3v-2zm4 4h10v2H7v-2z" />
+            </svg>
+            <span>KPI & Visualisations</span>
+        </button>
+        <button class="db-tab" data-tab="queries" id="tab-queries">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <span>Requêtes</span>
+        </button>
+        <button class="db-tab" data-tab="data" id="tab-data">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            <span>Données</span>
+        </button>
+    </div>
+
+    <!-- --- Main Content --- -->
+    <main class="main" id="main-content">
+
+        <!-- --- KPI Cards --- -->
+        <section class="kpi-section" id="kpi-section">
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-card--tweets" id="kpi-tweets">
+                    <div class="kpi-card__icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M22.46 6c-.77.35-1.6.58-2.46.69a4.3 4.3 0 0 0 1.88-2.38 8.59 8.59 0 0 1-2.72 1.04 4.28 4.28 0 0 0-7.32 3.91A12.16 12.16 0 0 1 3 4.79a4.28 4.28 0 0 0 1.32 5.72 4.24 4.24 0 0 1-1.94-.54v.05a4.28 4.28 0 0 0 3.43 4.2 4.27 4.27 0 0 1-1.93.07 4.29 4.29 0 0 0 4 2.97A8.59 8.59 0 0 1 2 19.54a12.13 12.13 0 0 0 6.56 1.92c7.88 0 12.2-6.53 12.2-12.2l-.01-.56A8.72 8.72 0 0 0 22.46 6z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-card__content">
+                        <span class="kpi-card__value" id="kpi-tweets-val">—</span>
+                        <span class="kpi-card__label">Tweets</span>
+                    </div>
+                    <div class="kpi-card__sparkline" id="spark-tweets"></div>
+                </div>
+                <div class="kpi-card kpi-card--users" id="kpi-users">
+                    <div class="kpi-card__icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-card__content">
+                        <span class="kpi-card__value" id="kpi-users-val">—</span>
+                        <span class="kpi-card__label">Utilisateurs</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-card--hashtags" id="kpi-hashtags">
+                    <div class="kpi-card__icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M20 10V8h-4V4h-2v4h-4V4H8v4H4v2h4v4H4v2h4v4h2v-4h4v4h2v-4h4v-2h-4v-4h4zm-6 4h-4v-4h4v4z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-card__content">
+                        <span class="kpi-card__value" id="kpi-hashtags-val">—</span>
+                        <span class="kpi-card__label">Hashtags distincts</span>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-card--milano" id="kpi-milano">
+                    <div class="kpi-card__icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                    </div>
+                    <div class="kpi-card__content">
+                        <span class="kpi-card__value" id="kpi-milano-val">—</span>
+                        <span class="kpi-card__label">#milano2026 Tweets</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- Charts Section --- -->
+        <section class="charts-section">
+            <div class="charts-grid">
+                <div class="chart-card" id="chart-hashtags-card">
+                    <div class="chart-card__header">
+                        <h3>Top 10 Hashtags</h3>
+                        <span class="chart-card__badge">Agrégation</span>
+                    </div>
+                    <div class="chart-card__body">
+                        <canvas id="chart-hashtags"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card" id="chart-likes-card">
+                    <div class="chart-card__header">
+                        <h3>Top 10 Tweets par Likes</h3>
+                        <span class="chart-card__badge">Tri</span>
+                    </div>
+                    <div class="chart-card__body">
+                        <canvas id="chart-likes"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card" id="chart-roles-card">
+                    <div class="chart-card__header">
+                        <h3>Distribution des Rôles</h3>
+                        <span class="chart-card__badge">Utilisateurs</span>
+                    </div>
+                    <div class="chart-card__body">
+                        <canvas id="chart-roles"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card" id="chart-timeline-card">
+                    <div class="chart-card__header">
+                        <h3>Timeline des Tweets</h3>
+                        <span class="chart-card__badge">Temporel</span>
+                    </div>
+                    <div class="chart-card__body">
+                        <canvas id="chart-timeline"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- Query Execution --- -->
+        <section class="query-section" id="query-section">
+            <div class="query-panel">
+                <div class="query-panel__header">
+                    <h2 id="query-panel-title">Exécution de Requêtes</h2>
+                    <p>Sélectionnez une requête et exécutez-la en temps réel</p>
+                </div>
+                <div class="query-panel__body">
+                    <div class="query-select-wrapper">
+                        <label for="query-select">Sélectionner une requête</label>
+                        <select id="query-select" class="query-select">
+                            <option value=""> Choisir une requête </option>
+                        </select>
+                        <p class="query-description" id="query-description"></p>
+                    </div>
+
+                    <div class="query-param-wrapper" id="query-param-wrapper" style="display: none; width: 300px; margin-bottom: 20px;">
+                        <div class="query-select-wrapper">
+                            <label for="query-param">Sélectionner un hashtag</label>
+                            <select id="query-param" class="query-select">
+                                <option value="">Chargement des hashtags...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="btn-execute" class="btn btn--primary btn--lg" disabled>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        <span>Exécuter</span>
+                    </button>
+                </div>
+                <div id="query-result-container">
+                    <div class="query-result" id="query-result-placeholder">
+                        <div class="query-result__placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                            <p>Sélectionnez et exécutez une requête pour voir les résultats ici.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="query-result-split" id="query-result-split" style="display: none;">
+                        <div class="query-panel-half" id="panel-mongo">
+                            <div class="panel-half-header">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                                </svg>
+                                <span>MongoDB</span>
+                            </div>
+                            <div class="panel-half-content" id="result-mongo-content"></div>
+                        </div>
+                        <div class="query-panel-half" id="panel-neo4j">
+                            <div class="panel-half-header">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                </svg>
+                                <span>Neo4j</span>
+                            </div>
+                            <div class="panel-half-content" id="result-neo4j-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- Data Section --- -->
+        <section class="data-section" id="data-section" style="display: none; animation: slideUp 0.5s var(--ease-out) both;">
+            <div class="data-split">
+                
+                <!-- Users Management Panel -->
+                <div class="query-panel" id="data-users-panel">
+                    <div class="query-panel__header">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h2>Gestion des Utilisateurs</h2>
+                                <p>Gérez les comptes, les rôles et les localisations</p>
+                            </div>
+                            <div class="chart-card__badge" style="background: rgba(139, 92, 246, 0.15); color: var(--accent-violet);">MongoDB</div>
+                        </div>
+                    </div>
+                    <div class="query-panel__body" style="padding-bottom: 24px; border-bottom: 1px solid var(--border);">
+                        <div class="data-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn--outline" onclick="showForm('user', 'add')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                                <span>Ajouter</span>
+                            </button>
+                            <button class="btn btn--outline" onclick="showForm('user', 'edit')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                <span>Modifier</span>
+                            </button>
+                            <button class="btn btn--outline btn--danger-outline" onclick="showForm('user', 'delete')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                <span>Supprimer</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-forms" style="padding: 24px; min-height: 200px;">
+                        <!-- Add User Form -->
+                        <div class="data-form-container" id="form-user-add" style="display: none;">
+                            <div class="query-select-wrapper">
+                                <label>Ajouter un nouvel Utilisateur</label>
+                                <form onsubmit="submitCrud(event, 'users', 'POST')" style="display: grid; gap: 16px;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <div>
+                                            <input type="text" id="u-add-username" class="query-select" placeholder="Nom d'utilisateur" required style="cursor: text;">
+                                        </div>
+                                        <div>
+                                            <select id="u-add-role" class="query-select" required>
+                                                <option value="" disabled selected>Choisir un rôle</option>
+                                                <option value="staff">Staff</option>
+                                                <option value="bénévole">Bénévole</option>
+                                                <option value="journaliste">Journaliste</option>
+                                                <option value="fan">Fan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <input type="text" id="u-add-country" class="query-select" placeholder="Pays" required style="cursor: text;">
+                                    <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 8px;">Confirmer l'ajout</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Edit User Form -->
+                        <div class="data-form-container" id="form-user-edit" style="display: none;">
+                            <div class="query-select-wrapper">
+                                <label>Modifier un Utilisateur Existant</label>
+                                <form onsubmit="submitCrud(event, 'users', 'PUT')" style="display: grid; gap: 16px;">
+                                    <input type="number" id="u-edit-id" class="query-select" placeholder="Identifiant (ID)" required style="cursor: text; border-color: var(--accent-indigo);">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <input type="text" id="u-edit-username" class="query-select" placeholder="Nouveau Nom" style="cursor: text;">
+                                        <select id="u-edit-role" class="query-select">
+                                            <option value="">Conserver le rôle</option>
+                                            <option value="staff">Staff</option>
+                                            <option value="bénévole">Bénévole</option>
+                                            <option value="journaliste">Journaliste</option>
+                                            <option value="fan">Fan</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" id="u-edit-country" class="query-select" placeholder="Nouveau Pays" style="cursor: text;">
+                                    <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 8px;">Enregistrer les modifications</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Delete User Form -->
+                        <div class="data-form-container" id="form-user-delete" style="display: none;">
+                            <div class="query-select-wrapper">
+                                <label style="color: var(--accent-rose);">❌ Supprimer un Utilisateur</label>
+                                <form onsubmit="submitCrud(event, 'users', 'DELETE')" style="display: grid; gap: 16px;">
+                                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Saisissez l'ID de l'utilisateur à retirer définitivement.</p>
+                                    <input type="number" id="u-del-id" class="query-select" placeholder="ID Utilisateur" required style="cursor: text; border-color: var(--accent-rose);">
+                                    <button type="submit" class="btn btn--danger" style="width: 100%; margin-top: 8px;">Confirmer la Suppression</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Empty State Wrapper -->
+                        <div class="panel-empty-state" id="user-crud-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 12px; opacity: 0.7;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            <p style="font-size: 0.85rem;">Sélectionnez une action pour gérer les utilisateurs</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tweets Management Panel -->
+                <div class="query-panel" id="data-tweets-panel">
+                    <div class="query-panel__header">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <h2>Gestion des Tweets</h2>
+                                <p>Publiez, modifiez ou modérez les messages</p>
+                            </div>
+                            <div class="chart-card__badge" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">MongoDB</div>
+                        </div>
+                    </div>
+                    <div class="query-panel__body" style="padding-bottom: 24px; border-bottom: 1px solid var(--border);">
+                        <div class="data-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn--outline" onclick="showForm('tweet', 'add')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                                <span>Ajouter</span>
+                            </button>
+                            <button class="btn btn--outline" onclick="showForm('tweet', 'edit')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                <span>Modifier</span>
+                            </button>
+                            <button class="btn btn--outline btn--danger-outline" onclick="showForm('tweet', 'delete')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                <span>Supprimer</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="data-forms" style="padding: 24px; min-height: 200px;">
+                        <!-- Add Tweet Form -->
+                        <div class="data-form-container" id="form-tweet-add" style="display: none;">
+                            <div class="query-select-wrapper">
+                                <label>Rédiger un nouveau Tweet</label>
+                                <form onsubmit="submitCrud(event, 'tweets', 'POST')" style="display: grid; gap: 16px;">
+                                    <div style="display: grid; grid-template-columns: 100px 1fr; gap: 16px;">
+                                        <input type="number" id="t-add-userid" class="query-select" placeholder="ID Auteur" required style="cursor: text;">
+                                        <input type="text" id="t-add-hashtags" class="query-select" placeholder="Hashtags (ex: milano, olympics)" style="cursor: text;">
+                                    </div>
+                                    <textarea id="t-add-text" class="query-select" placeholder="De quoi souhaitez-vous parler ?" required style="cursor: text; min-height: 100px; padding-top: 12px;"></textarea>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <input type="number" id="t-add-fav" class="query-select" placeholder="Favoris (défaut 0)" style="cursor: text;">
+                                        <input type="number" id="t-add-reply" class="query-select" placeholder="ID Réponse à..." style="cursor: text;">
+                                    </div>
+                                    <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 8px;">Publier le Tweet</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Edit Tweet Form -->
+                        <div class="data-form-container" id="form-tweet-edit" style="display: none;">
+                            <div class="query-select-wrapper">
+                                <label>Mettre à jour un Tweet</label>
+                                <form onsubmit="submitCrud(event, 'tweets', 'PUT')" style="display: grid; gap: 16px;">
+                                    <input type="number" id="t-edit-id" class="query-select" placeholder="ID Tweet à modifier" required style="cursor: text; border-color: var(--accent-indigo);">
+                                    <textarea id="t-edit-text" class="query-select" placeholder="Nouveau texte du message" style="cursor: text; min-height: 80px; padding-top: 12px;"></textarea>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <input type="number" id="t-edit-userid" class="query-select" placeholder="Changer ID Auteur" style="cursor: text;">
+                                        <input type="text" id="t-edit-hashtags" class="query-select" placeholder="Nouveaux hashtags" style="cursor: text;">
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <input type="number" id="t-edit-fav" class="query-select" placeholder="Likes" style="cursor: text;">
+                                        <input type="number" id="t-edit-reply" class="query-select" placeholder="Réponse à ID..." style="cursor: text;">
+                                    </div>
+                                    <button type="submit" class="btn btn--primary" style="width: 100%; margin-top: 8px;">Valider les corrections</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Delete Tweet Form -->
+                        <div class="data-form-container" id="form-tweet-delete" style="display: none;">
+                            <div class="query-select-wrapper">
+                                <label style="color: var(--accent-rose);">❌ Supprimer un Message</label>
+                                <form onsubmit="submitCrud(event, 'tweets', 'DELETE')" style="display: grid; gap: 16px;">
+                                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Attention, cette action est irréversible.</p>
+                                    <input type="number" id="t-del-id" class="query-select" placeholder="ID du Tweet" required style="cursor: text; border-color: var(--accent-rose);">
+                                    <button type="submit" class="btn btn--danger" style="width: 100%; margin-top: 8px;">Retirer définitivement</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Empty State Wrapper -->
+                        <div class="panel-empty-state" id="tweet-crud-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 12px; opacity: 0.7;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+                            <p style="font-size: 0.85rem;">Gérez l'intégralité du flux de messages</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <!-- --- Toast notifications --- -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000/api';
+    </script>
+    <script src="dashboard.js"></script>
+    <script src="graph.js"></script>
+</body>
+
+</html>

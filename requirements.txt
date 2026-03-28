@@ -1,0 +1,9 @@
+pymongo
+faker
+python-dotenv
+neo4j
+matplotlib
+seaborn
+pandas
+flask
+flask-cors
