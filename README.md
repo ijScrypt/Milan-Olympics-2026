@@ -3,7 +3,7 @@
 # Milano 2026 : Analyse NoSQL avec MongoDB & Neo4j
 **Rapport de Projet Académique - Base de Données NoSQL**
 
-![University Logo](university_logo.png) 
+![University Logo](screenshots/university_logo.png) 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white) 
 ![Neo4j](https://img.shields.io/badge/Neo4j-008CC1?style=for-the-badge&logo=neo4j&logoColor=white) 
@@ -18,20 +18,6 @@
   Votre navigateur ne supporte pas la lecture de vidéos.
 </video>
 *Démonstration vidéo du tableau de bord Milano 2026 en direct*
-
----
-
-## Table des matières
-1. [Introduction et objectifs](#1-introduction-et-objectifs)
-2. [Environnement local](#2-environnement-local)
-3. [Modèle MongoDB](#3-modèle-mongodb)
-4. [Modèle Neo4j](#4-modèle-neo4j)
-5. [Implémentation Python](#5-implémentation-python)
-6. [Analyses et Requêtes MongoDB + Cypher (Les 16 requêtes)](#6-analyses-et-requêtes)
-7. [Visualisations](#7-visualisations)
-8. [Gestion de Projet Agile/Scrum](#8-agilescrum)
-9. [Difficultés et Solutions](#9-difficultés--solutions)
-10. [Conclusion](#10-conclusion)
 
 ---
 
@@ -70,7 +56,7 @@ Cloner le dépôt, puis installer les dépendances (l'utilisation d'un environne
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # Sous Windows: venv\Scripts\activate
+source venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -122,10 +108,10 @@ Le modèle de données documentaire est orienté "Write-heavy" et utilise deux c
 | `in_reply_to_tweet_id`| Integer / Null | ID d'un autre tweet (si c'est une réponse) |
 
 ![MongoDB Schema User](screenshots/mongo_schema_user.png)
-*Représentation visuelle de la collection Users*
+
 
 ![MongoDB Schema Tweets](screenshots/mongo_schema_tweets.png)
-*Représentation visuelle de la collection Tweets*
+
 
 ### Méthodes CRUD
 Les opérations CRUD sont centralisées dans `services_mongo.py`. Voici des extraits des implémentations réelles de ces méthodes de base.
@@ -169,20 +155,6 @@ Pour analyser le réseau, l'intégralité du dataset de MongoDB est migré vers 
 - `(User) -[:FOLLOWS]-> (User)` : Un utilisateur suit le compte d'un autre utilisateur.
 - `(Tweet) -[:REPLY_TO]-> (Tweet)` : Structure hiérarchique d'une discussion (fil de tweets).
 
-### Représentation ASCII (Schema)
-
-```text
-    +-----------------------------------------------+
-    |                  [:FOLLOWS]                   |
-    v                                               |
- (User {user_id, username, role, country}) ---------+
-    |                                 |
-    | [:AUTHORED]                     | [:RETWEETS]
-    |                                 v
-    |     +-----------------------------------------+
-    v     |                 [:REPLY_TO]             |
- (Tweet {tweet_id, text, hashtags, favs...}) <------+
-```
 
 *Contraintes métiers implémentées via APOC/Cypher (`CREATE CONSTRAINT user_id_unique...`)*.
 
@@ -204,7 +176,6 @@ L'architecture applicative est construite autour de principes de *Clean Architec
  ┣ 📜 dashboard.css        # Styles de l'interface
  ┣ 📜 dashboard.js         # Fetch HTTP, manipulations DOM, Chart.js
  ┣ 📜 graph.js             # Visualisation de graphes (Vis.js)
- ┣ 📜 main.py              # Point d'entrée script CLI
  ┣ 📜 mongo_client.py      # Singleton: Connexion pymongo
  ┣ 📜 neo4j_client.py      # Singleton: Connexion neo4j.Driver
  ┣ 📜 requirements.txt     # Dépendances applicatives Python
@@ -434,9 +405,9 @@ L'application expose ses analyses visuellement via plusieurs librairies. La couc
 ![Dashboard Overall](screenshots/Dashboard_overall.png)
 *Vue complète du Dashboard analytique Milano 2026*
 
-| Objectif | Image Générée | Interprétation Analytique |
-|:---|:---:|:---|
-| **Topologie Sociale (Roles)** | ![Roles Distribution Placeholder](screenshots/user_roles.png) | Réalisé au moyen de Seaborn. L'équilibre probabiliste a été implémenté en Python pour s'assurer que les rôles `staff`, `journaliste`, `bénévole`, et `fan` soient statistiquement cohérents. |
+| Objectif | Interprétation Analytique |
+|:---:|---|
+| **Topologie Sociale (Roles)** | Réalisé au moyen de Seaborn. L'équilibre probabiliste a été implémenté en Python pour s'assurer que les rôles `staff`, `journaliste`, `bénévole`, et `fan` soient statistiquement cohérents. |
 
 *(Note : les images au-dessus sont compilées automatiquement via l'exécution de `visualizations.py` intégré dans le runner).*
 
@@ -450,43 +421,13 @@ L'application expose ses analyses visuellement via plusieurs librairies. La couc
 *Camembert de la distribution comportementale et sociologique.*
 
 ![Tweet Timeline](screenshots/timeline_des_tweets.png)
-*Progression linéaire par timestamp de la masse des publications X/Twitter.*
+*Progression linéaire par timestamp de la masse des publications.*
 
 ---
 
-## 8. Agile/Scrum
 
-La création intégrale de ce système repose sur une gestion agile réclamant environ **21 heures de travail en 3 Sprints structurés**.
 
-### Product Backlog
-| ID | User Story | Effort (Pts) | Priorité |
-|---|---|---|---|
-| US1 | "En tant que DevOps, instaurer un squelette modulaire API/Flask" | 3 | Haute |
-| US2 | "En tant que Data Engineer, développer le faker dynamique pour le seeding et insérer sous MongoDB." | 5 | Haute |
-| US3 | "En tant qu'Analyste métier, coder les aggrégations MongoDB pour extraire les KPIs" | 5 | Haute |
-| US4 | "En tant qu'Admin Base de Données, initier le graph Neo4j en convertissant les documents MongoDB via pipeline Cypher." | 8 | Moyenne|
-| US5 | "En tant que Full-Stack, exposer les 16 requêtes algorithmiques sous un Dashboard en connectant HTML et CSS/JavaScript (Vis.js)." | 13 | Moyenne|
-
-### Daily Logs et Rétrospectives de Sprint
-
-**Sprint 1 : Fondation Documentaire (Temps : 7h)**
-- **Missions effectuées** : Architecture des conteneurs, connexion MongoDB singleton, intégration de Faker (`seed.py`), structure JSON retenue pour `users` et `tweets`, opérations CRUD primaires.
-- **Review (Démonstration)** : Validation complète du script `python main.py` capable de générer spontanément des données consistantes de façon dynamique.
-- **Retrospective** : L'utilisation précoce de Faker a accéléré considérablement la testabilité. Point à améliorer : optimiser l'asynchronisme de l'insertion (`insert_many` et non des single instantiations dans une boucle).
-
-**Sprint 2 : Back-end Querying & Cypher Data Modeling (Temps : 7h)**
-- **Missions effectuées** : Traduction des problématiques analytiques en filtres MongoDB JSON (`services_mongo.py`), intégration au driver Neo4j, écriture intégrale des requêtes cypher pour la résolution des problématiques de graphe, création script de migration (`services_neo4j.py`).
-- **Review (Démonstration)** : Tous les tests des requêtes retournent des données cohérentes sur l'Axe MongoDB et l'Axe Neo4j respectant les contraintes APOC.
-- **Retrospective** : Temps initial perdu sur le formatage "ObjectId" et ISO-8601 des dates Mongo (non compatibles nativement). Cela a été résolu par l'implémentation du nettoyeur `format_mongo_for_neo4j()`.
-
-**Sprint 3 : UI / Visualisation et Déploiement Agile (Temps : 7h)**
-- **Missions effectuées** : Finalisation index HTML, CSS responsif dark mode premium, Dashboard.js effectuant de l'AJAX. Générations automatiques Python (Matplotlib), Intégrations Vis.js Network.
-- **Review (Démonstration)** : Le front-end effectue avec succès les requêtes d'interfaces qui sollicitent les algos NoSQL codés aux Sprints précédents.
-- **Retrospective** : L'injection de la librairie visuelle par graphes massifs D3/Network a engendré des temps de latence frontend initialement, corrigés en implémentant une limite aux 100 premiers noeuds via Cypher. 
-
----
-
-## 9. Difficultés & Solutions
+## 8. Difficultés & Solutions
 
 ### Difficulté N°1 : Conflits de Typage / Parsing (Datetime vs ObjectId)
 Par défaut, le client PyMongo renvoie des types de valeurs bson natifs (`ObjectId` illisibles et format timestamp bas niveau) là où l'API Flask et Neo4j nécessitent un JSON stringifié standard.
@@ -499,18 +440,3 @@ C'est la difficulté majeure des faux jeu de données "random": assurer logiquem
 ### Difficulté N°3 : Le Parcours de Graphe Neo4j Indéfini (Query 15 & 16)
 Les discussions sociales comportent de base une profondeur incertaine ($N$ degrés de liberté, un fil de réponses est infini).
 **Solution** : Implémenter et maîtriser les opérateurs Path Cypher stricts tel que `[leaf:Tweet]-[:REPLY_TO*0..]->(root)` (parcours dynamique) mais en fixant des conditions géometriques strictes d'exclusions des bords, c'est-à-dire une `leaf` définie expressément par son incapacité à générer des arêtes sortantes (`WHERE NOT ()-[:REPLY_TO]->(leaf)`).
-
----
-
-## 10. Conclusion
-
-Ce système "Milano 2026 Dashboard" accomplit exhaustivement le cahier des charges d'aggrégation et d'analyse en tirant parti du principe fondateur des bases de données de nouvelle génération dite NoSQL.
-
-En spécialisant méticuleusement le travail : **MongoDB** pour l'ingestion horizontale massive et le requêtage documentaire (Aggrégations de tags complexes, classements performants) et **Neo4j** pour traverser par récursivité un graphe aux relations ultra-denses, l'application atteint des performances dont une modélisation SQL relationnelle standard serait incapable en situation temps réel.
-
-En respectant parallèlement le framework Agile et l'exigence d'une couche d'abstraction Python centralisant les architectures, ce projet permet de justifier la note académique optimale (20/20) au vu de son exhaustivité théorique et technique.
-
-<div align="center">
-  <br>
-  <i>Projet Réalisé avec Succès - Base de données Avancées NoSQL 2026</i>
-</div>
