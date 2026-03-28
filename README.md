@@ -14,6 +14,9 @@
 
 ## Demo
 
+<videocontrols>
+<sourcesrc="screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4"type="video/mp4">
+</video>
 <video src="screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4" controls width="100%">
   Votre navigateur ne supporte pas la lecture de vidéos.
 </video>
