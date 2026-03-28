@@ -1,10 +1,7 @@
-
-/* --- State ------------------------------------------------------------------- */
 let queries = {};
 let charts = {};
 let activeTab = 'kpi';
 
-/* ─── Utilities ─────────────────────────────────────────────────────────────── */
 function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return document.querySelectorAll(sel); }
 
@@ -25,14 +22,13 @@ function animateNumber(el, target, duration = 800) {
     function update(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
         el.textContent = Math.round(start + range * eased).toLocaleString('fr-FR');
         if (progress < 1) requestAnimationFrame(update);
     }
     requestAnimationFrame(update);
 }
 
-/* --- Toast System ------------------------------------------------------------ */
 function showToast(message, type = 'info') {
     const container = $('#toast-container');
     const toast = document.createElement('div');
@@ -48,7 +44,6 @@ function showToast(message, type = 'info') {
     }, 3500);
 }
 
-/* --- Connection Status ------------------------------------------------------- */
 async function checkConnection() {
     const statusEl = $('#connection-status');
     try {
@@ -61,7 +56,6 @@ async function checkConnection() {
     }
 }
 
-/* --- KPI Loading ------------------------------------------------------------- */
 async function loadKPIs() {
     try {
         const data = await apiFetch('/kpis');
@@ -75,7 +69,6 @@ async function loadKPIs() {
     }
 }
 
-/* --- Chart Config (shared) --------------------------------------------------- */
 Chart.defaults.color = '#a1a1aa';
 Chart.defaults.borderColor = 'rgba(63, 63, 70, 0.35)';
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -87,7 +80,6 @@ const CHART_COLORS = [
 
 const CHART_COLORS_ALPHA = CHART_COLORS.map(c => c + '33');
 
-/* --- Charts ------------------------------------------------------------------ */
 async function loadCharts() {
     await Promise.all([
         loadHashtagsChart(),
@@ -277,7 +269,6 @@ async function loadTimelineChart() {
     } catch (err) { console.error('Timeline chart error:', err); }
 }
 
-/* --- Query System ------------------------------------------------------------ */
 async function loadPopularHashtags() {
     const paramInput = $('#query-param');
     try {
@@ -289,7 +280,6 @@ async function loadPopularHashtags() {
             opt.textContent = '#' + h.hashtag + ` (${h.count})`;
             paramInput.appendChild(opt);
         });
-        // Default select if milano2026 is present
         if (hashtags.some(h => h.hashtag === 'milano2026')) {
             paramInput.value = 'milano2026';
         }
@@ -313,7 +303,6 @@ function updateQueryOptions() {
     const currentVal = select.value;
     select.innerHTML = '<option value=""> Choisir une requête </option>';
 
-    // Sort keys logically by number or label if you like, but keys are already in roughly OK order
     for (const [id, q] of Object.entries(queries)) {
         const opt = document.createElement('option');
         opt.value = id;
@@ -334,7 +323,6 @@ function onQuerySelect(e) {
         btn.disabled = false;
         desc.textContent = queries[id].description;
         
-        // Show parameter input for hashtag-specific queries
         if (id === 'q4_count_tweets_hashtag' || id === 'q5_distinct_users_milano2026') {
              paramWrap.style.display = 'block';
              loadPopularHashtags();
@@ -354,12 +342,10 @@ async function executeQuery() {
     if (!queryId) return;
 
     const btn = $('#btn-execute');
-    const resultEl = $('#query-result');
     btn.classList.add('btn--loading');
 
     const payload = { query_id: queryId };
     
-    // Add optional parameter if provided
     const paramInput = $('#query-param');
     if (paramInput && (queryId === 'q4_count_tweets_hashtag' || queryId === 'q5_distinct_users_milano2026') && paramInput.value.trim()) {
         payload.param = paramInput.value.trim();
@@ -398,7 +384,6 @@ function renderQueryResultBoth(res) {
     const query = res.query || {};
     const queryId = $('#query-select').value;
     
-    // Fallback if the backend returned no_data wrapper (from previous code)
     const actualResult = result.no_data ? {} : result;
     const dataList = actualResult.data || [];
     const theCount = actualResult.count;
@@ -406,7 +391,6 @@ function renderQueryResultBoth(res) {
     const mongoContainer = $('#result-mongo-content');
     const neo4jContainer = $('#result-neo4j-content');
 
-    // MONGODB PANEL (Text / Table)
     if (theCount !== undefined && !actualResult.data) {
         mongoContainer.innerHTML = `
             <div class="query-result__count" style="height: 100%; justify-content: center;">
@@ -448,13 +432,11 @@ function renderQueryResultBoth(res) {
     }
 
 
-    // NEO4J PANEL (Interactive Graph)
     neo4jContainer.innerHTML = '<div class="graph-box" style="width:100%; height:100%; min-height:400px; background:var(--bg-base);"></div>';
     const graphContainer = neo4jContainer.querySelector('.graph-box');
     
     let nodesData = [], edgesData = [];
     
-    // Graph construction for ALL queries
     if (['q1_count_users', 'q2_count_tweets', 'q3_count_distinct_hashtags', 'q4_count_tweets_hashtag'].includes(queryId)) {
         nodesData.push({ id: 1, label: String(theCount || 0), value: theCount || 10, title: query.label, color: '#6366f1', font: {size: 24, bold: true} });
     } else if (queryId === 'q5_distinct_users_milano2026') {
@@ -560,9 +542,7 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-/* --- Tabs Switching -------------------------------------------------------- */
 function setupTabs() {
-    // Initial State
     $('#kpi-section').style.display = '';
     $('.charts-section').style.display = '';
     $('#query-section').style.display = 'none';
@@ -587,14 +567,12 @@ function setupTabs() {
     });
 }
 
-/* --- Re-seed ----------------------------------------------------------------- */
 async function reseed() {
     const btn = $('#btn-seed');
     btn.classList.add('btn--loading');
     try {
         await apiFetch('/seed', { method: 'POST' });
         showToast('Base de données re-seedée avec succès !', 'success');
-        // Reload everything
         await Promise.all([loadKPIs(), loadCharts()]);
     } catch (err) {
         showToast('Erreur lors du re-seed', 'error');
@@ -603,16 +581,13 @@ async function reseed() {
     }
 }
 
-/* --- Init -------------------------------------------------------------------- */
 async function init() {
     setupTabs();
 
-    // Event listeners
     $('#query-select').addEventListener('change', onQuerySelect);
     $('#btn-execute').addEventListener('click', executeQuery);
     $('#btn-seed').addEventListener('click', reseed);
 
-    // Check connection & load data
     const connected = await checkConnection();
     if (connected) {
         showToast('Connecté à MongoDB avec succès', 'success');
@@ -622,12 +597,10 @@ async function init() {
     }
 }
 
-/* --- Data CRUD --------------------------------------------------------------- */
 function showForm(type, action) {
     const panel = document.getElementById(`data-${type}s-panel`);
     if (!panel) return;
     
-    // Hide all forms AND the empty state
     panel.querySelectorAll('.data-form-container').forEach(el => el.style.display = 'none');
     const emptyState = document.getElementById(`${type}-crud-empty`);
     if (emptyState) emptyState.style.display = 'none';
@@ -691,7 +664,6 @@ async function submitCrud(event, resourceType, method) {
             form.reset();
             form.parentElement.style.display = 'none';
             
-            // Show empty state again
             const type = resourceType.endsWith('s') ? resourceType.slice(0, -1) : resourceType;
             const emptyState = document.getElementById(`${type}-crud-empty`);
             if (emptyState) emptyState.style.display = 'flex';

@@ -84,7 +84,6 @@ class Neo4jService:
             MERGE (u)-[:RETWEETS]->(t)
             """)
 
-    # Liste des followers de MilanoOps
     def get_milano_ops_followers(self):
         results = self._run_read_query("""
             MATCH (follower:User)-[:FOLLOWS]->(ops:User {username: "MilanoOps"})
@@ -92,7 +91,6 @@ class Neo4jService:
         """)
         return [r["username"] for r in results]
 
-    # Liste des utilisateurs suivis par MilanoOps
     def get_milano_ops_following(self):
         results = self._run_read_query("""
             MATCH (ops:User {username: "MilanoOps"})-[:FOLLOWS]->(followed:User)
@@ -100,7 +98,6 @@ class Neo4jService:
         """)
         return [r["username"] for r in results]
 
-    # Utilisateurs qui se suivent mutuellement avec MilanoOps (Q9)
     def get_mutual_follows_with(self, username="MilanoOps"):
         results = self._run_read_query("""
             MATCH (u1:User {username: $username})-[:FOLLOWS]->(u2:User),
@@ -109,7 +106,6 @@ class Neo4jService:
         """, username=username)
         return [r["username"] for r in results]
 
-    # Utilisateurs avec plus de X followers (hubs)
     def get_hubs(self, threshold=10):
         return self._run_read_query("""
             MATCH (u:User)<-[r:FOLLOWS]-(:User)
@@ -119,7 +115,6 @@ class Neo4jService:
             ORDER BY followers_count DESC
         """, threshold=threshold)
 
-    # Utilisateurs qui suivent plus de X utilisateurs
     def get_active_followers(self, threshold=5):
         return self._run_read_query("""
             MATCH (u:User)-[r:FOLLOWS]->(:User)
@@ -129,7 +124,6 @@ class Neo4jService:
             ORDER BY following_count DESC
         """, threshold=threshold)
 
-    # Root tweets of conversations
     def get_conversation_roots(self):
         return self._run_read_query("""
             MATCH (root:Tweet)<-[:REPLY_TO]-(:Tweet)
@@ -137,7 +131,6 @@ class Neo4jService:
             RETURN DISTINCT root.tweet_id AS tweet_id, root.text AS text
         """)
 
-    # La plus longue chaîne de réponses
     def get_longest_discussion(self):
         with self.driver.session() as session:
             result = session.run("""
@@ -155,7 +148,6 @@ class Neo4jService:
                 }
             return None
 
-    # Début (racine) et fin (feuille la plus éloignée) pour chaque fil de conversation
     def get_thread_extents(self):
         return self._run_read_query("""
             MATCH (root:Tweet)
@@ -170,7 +162,6 @@ class Neo4jService:
         """)
 
     def get_kpis(self):
-        """Retourne les KPIs aggrégés depuis Neo4j."""
         query = """
         CALL {
             MATCH (n:User) RETURN count(n) AS user_count
@@ -206,13 +197,14 @@ class Neo4jService:
             "total_replies": data.get("replies_count", 0),
             "total_relationships": sum(data.get(f"{rel}_count", 0) for rel in ["follows", "authored", "retweets", "replies"])
         }
+
     def get_milano_ops_ego_network(self):
         with self.driver.session() as session:
             result = session.run("""
                 MATCH (m:User {username: "MilanoOps"})-[r]-(neighbor)
                 RETURN m, r, neighbor
             """)
-            nodes = {}  # Use a dict for O(1) lookups
+            nodes = {}
             edges = []
 
             for record in result:
@@ -226,16 +218,16 @@ class Neo4jService:
                         "id": m_id, 
                         "label": m_node['username'], 
                         "group": "center", 
-                        "color": "#f59e0b", # Emphasize center node
+                        "color": "#f59e0b",
                         "size": 30
                     }
 
                 neighbor_id = neighbor_node.get('user_id') or neighbor_node.get('tweet_id')
                 if neighbor_id and neighbor_id not in nodes:
-                    if 'username' in neighbor_node: # It's a User
+                    if 'username' in neighbor_node:
                         group = "user"
                         color = "#6366f1"
-                    else: # It's a Tweet
+                    else:
                         group = "tweet"
                         color = "#10b981"
                     
@@ -247,9 +239,6 @@ class Neo4jService:
                         "color": color
                     }
                 
-                # Determine edge direction from the relationship object
-                # rel.start_node.element_id is only available in some driver versions,
-                # so comparing properties is safer.
                 if rel.start_node['user_id'] == m_id:
                     source_id, target_id = m_id, neighbor_id
                 else:
@@ -299,7 +288,6 @@ class Neo4jService:
                 
                 edges.append({"from": n1_id, "to": n2_id, "label": rel.type})
                 
-                # Data for the table view
                 table_data.append({
                     "Source": n1_label,
                     "Type": rel.type,

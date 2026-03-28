@@ -1,7 +1,3 @@
-"""
-Flask API backend for the Milano 2026 Dashboard.
-Exposes MongoDB data and query execution endpoints.
-"""
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from services_mongo import MongoService
@@ -19,7 +15,6 @@ neo4j = Neo4jService()
 
 
 class JSONEncoder(json.JSONEncoder):
-    """Custom encoder to handle ObjectId and datetime."""
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
@@ -32,7 +27,6 @@ app.json_encoder = JSONEncoder
 
 
 def serialize(doc):
-    """Convert MongoDB document to JSON-serializable dict."""
     if doc is None:
         return None
     if isinstance(doc, list):
@@ -43,11 +37,8 @@ def serialize(doc):
     return doc
 
 
-# ─── KPI Endpoints ───────────────────────────────────────────────────────────
-
 @app.route('/api/kpis', methods=['GET'])
 def get_kpis():
-    """Return all KPIs for the dashboard header."""
     return jsonify({
         'total_users': mongo.count_users(),
         'total_tweets': mongo.count_tweets(),
@@ -60,11 +51,8 @@ def get_kpis():
 
 @app.route('/api/kpis/neo4j', methods=['GET'])
 def get_neo4j_kpis():
-    """Return all KPIs for the dashboard header."""
     return jsonify(neo4j.get_kpis())
 
-
-# ─── Data Endpoints ──────────────────────────────────────────────────────────
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
@@ -100,7 +88,6 @@ def get_user_roles():
 
 @app.route('/api/tweet-timeline', methods=['GET'])
 def get_tweets_timeline():
-    """Aggregate tweet counts by date for timeline chart."""
     pipeline = [
         {"$group": {
             "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$created_at"}},
@@ -111,8 +98,6 @@ def get_tweets_timeline():
     result = list(mongo.tweets_col.aggregate(pipeline))
     return jsonify([{"date": r["_id"], "count": r["count"]} for r in result])
 
-
-# ─── Query Execution ─────────────────────────────────────────────────────────
 
 AVAILABLE_QUERIES = {
     "q1_count_users": {
@@ -200,13 +185,11 @@ AVAILABLE_QUERIES = {
 
 @app.route('/api/queries', methods=['GET'])
 def list_queries():
-    """Return available queries."""
     return jsonify(AVAILABLE_QUERIES)
 
 
 @app.route('/api/execute', methods=['POST'])
 def execute_query():
-    """Execute a selected query and return results."""
     data = request.get_json()
     query_id = data.get('query_id')
     param = data.get('param')
@@ -217,13 +200,11 @@ def execute_query():
 
     q_info = AVAILABLE_QUERIES.get(query_id)
 
-    # If the requested target_db doesn't match the query's native db, return no_data
     if target_db and target_db != q_info.get("db"):
         return jsonify({"result": {"no_data": True}, "query": q_info, "target_db": target_db})
 
     result = None
     try:
-        # MongoDB
         if query_id == "q1_count_users":
             result = {"count": mongo.count_users()}
         elif query_id == "q2_count_tweets":
@@ -246,7 +227,6 @@ def execute_query():
             result = {"data": serialize(mongo.get_top_10_tweets_by_likes())}
         elif query_id == "q13_top_10_hashtags":
             result = {"data": serialize(mongo.get_top_10_hashtags())}
-        # Neo4j
         elif query_id == "q7_neo4j_milano_ops_followers":
             result = {"data": neo4j.get_milano_ops_followers()}
         elif query_id == "q8_neo4j_milano_ops_following":
@@ -277,18 +257,14 @@ def execute_query():
     })
 
 
-# --- Seed Endpoint -----------------------------------------------------------
-
 @app.route('/api/seed', methods=['POST'])
 def seed_data():
-    """Re-seed the database."""
     try:
         SeedService(mongo).execute_seed(30, 200, 0.35)
         return jsonify({'message': 'Base de données re-seedée avec succès', 'success': True})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# --- CRUD Users -------------------------------------------------------------
 
 @app.route('/api/users', methods=['POST'])
 def create_user():
@@ -334,8 +310,6 @@ def delete_user_endpoint(user_id):
     return jsonify({"success": True, "data": {"deleted_count": res.deleted_count}})
 
 
-# --- CRUD Tweets ------------------------------------------------------------
-
 @app.route('/api/tweets', methods=['POST'])
 def create_tweet():
     data = request.get_json()
@@ -365,7 +339,6 @@ def update_tweet_endpoint(tweet_id):
         return jsonify({"success": False, "error": "No data provided"}), 400
         
     if 'hashtags' in data and not isinstance(data['hashtags'], list):
-        # If it's a string, try to convert it (should be handled by JS but safety first)
         if isinstance(data['hashtags'], str):
              data['hashtags'] = [h.strip() for h in data['hashtags'].split(',')]
         else:
@@ -384,13 +357,10 @@ def delete_tweet_endpoint(tweet_id):
     if res.deleted_count == 0:
         return jsonify({"success": False, "error": "Tweet not found"}), 404
     return jsonify({"success": True, "data": {"deleted_count": res.deleted_count}})
+
+
 if __name__ == '__main__':
-    # Auto-seed if database is empty
     if mongo.count_users() == 0:
-        print("[INIT] Base de données vide détectée - seeding automatique...")
         SeedService(mongo).execute_seed(30, 200, 0.35)
-        print(f"[INIT] [OK] {mongo.count_users()} utilisateurs, {mongo.count_tweets()} tweets créés.")
-    else:
-        print(f"[INIT] Base existante : {mongo.count_users()} utilisateurs, {mongo.count_tweets()} tweets.")
 
     app.run(debug=True, port=5000)

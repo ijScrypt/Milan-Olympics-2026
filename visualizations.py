@@ -22,7 +22,6 @@ class VisualizationService:
     def generate_mongo_charts(self):
         logger.info("Generating MongoDB analytics charts...")
         
-        # 1. Top 10 Hashtags
         hashtags_data = self.mongo_service.get_top_10_hashtags()
         if hashtags_data:
             df_tags = pd.DataFrame(hashtags_data)
@@ -36,11 +35,9 @@ class VisualizationService:
             plt.close()
             logger.info("Saved top_10_hashtags.png")
 
-        # 2. Top 10 Tweets by Likes
         tweets_data = self.mongo_service.get_top_10_tweets_by_likes()
         if tweets_data:
             df_tweets = pd.DataFrame(tweets_data)
-            # Shorten text for display
             df_tweets['short_text'] = df_tweets['text'].apply(lambda x: (x[:40] + '...') if len(x) > 40 else x)
             plt.figure(figsize=(10, 6))
             sns.barplot(x='favorite_count', y='short_text', data=df_tweets, palette='magma')
@@ -52,7 +49,6 @@ class VisualizationService:
             plt.close()
             logger.info("Saved top_10_tweets_likes.png")
 
-        # 3. KPI Summary Chart (User Roles)
         users = self.mongo_service.get_all_users()
         if users:
             df_users = pd.DataFrame(users)
@@ -75,15 +71,12 @@ class VisualizationService:
 
         net = Network(height="750px", width="100%", bgcolor="#222222", font_color="white", notebook=False)
         
-        # Add nodes
         for node in graph_data["nodes"]:
             net.add_node(node['id'], label=node['label'], title=f"Type: {node['type']}", color=node['color'])
         
-        # Add edges
         for edge in graph_data["edges"]:
             net.add_edge(edge['from'], edge['to'], label=edge['label'], color="#aaaaaa")
         
-        # Network settings for better visualization
         net.toggle_physics(True)
         
         output_path = os.path.join(self.output_dir, "milano_ops_ego_network.html")
@@ -91,7 +84,6 @@ class VisualizationService:
         logger.info(f"Saved Neo4j graph visualization to {output_path}")
 
 if __name__ == "__main__":
-    # Test run
     setup_logging()
     m = MongoService()
     n = Neo4jService()

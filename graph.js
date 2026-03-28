@@ -1,5 +1,3 @@
-
-/* --- Graph Rendering --------------------------------------------------------- */
 function renderGraph(nodes, edges) {
     const container = document.getElementById('neo4j-graph-container');
     if (!container) return;
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const neo4jTab = document.getElementById('tab-neo4j');
     if (neo4jTab) {
         neo4jTab.addEventListener('click', () => {
-            // Give the tab switch a moment to complete
             setTimeout(loadAndRenderGraph, 100);
         });
     }

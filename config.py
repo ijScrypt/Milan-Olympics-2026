@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 
-# Load variables from .env into environment
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
