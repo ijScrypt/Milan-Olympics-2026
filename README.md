@@ -1,7 +1,9 @@
 <div align="center">
 
 # Milano 2026 : Analyse NoSQL avec MongoDB & Neo4j
-**Rapport de Projet Académique - Base de Données NoSQL**
+**Rapport de Projet NoSQL**
+**Membres du Projet :** BARHOUMI Mohamed Amine, JAGHAR Ismail, LERIDON DE MIGUEL Simon, ALOUI Fadi
+
 
 ![University Logo](screenshots/university_logo.png) 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
