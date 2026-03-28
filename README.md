@@ -16,7 +16,10 @@
 
 ## Demo
 
-https://github.com/ijScrypt/Milan-Olympics-2026/blob/amine/screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4
+
+
+https://github.com/user-attachments/assets/f26d1df0-c75f-4d38-b9db-68bb1854df22
+
 
 ---
 
