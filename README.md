@@ -1,8 +1,9 @@
 <div align="center">
 
-# 📊 Milano 2026 : Analyse NoSQL avec MongoDB & Neo4j
+# Milano 2026 : Analyse NoSQL avec MongoDB & Neo4j
 **Rapport de Projet Académique - Base de Données NoSQL**
 
+![University Logo](university_logo.png) 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) 
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white) 
 ![Neo4j](https://img.shields.io/badge/Neo4j-008CC1?style=for-the-badge&logo=neo4j&logoColor=white) 
@@ -13,12 +14,14 @@
 
 ## Demo
 
-![Demo Video](screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4)
+<video src="screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4" controls width="100%">
+  Votre navigateur ne supporte pas la lecture de vidéos.
+</video>
 *Démonstration vidéo du tableau de bord Milano 2026 en direct*
 
 ---
 
-## 📑 Table des matières
+## Table des matières
 1. [Introduction et objectifs](#1-introduction-et-objectifs)
 2. [Environnement local](#2-environnement-local)
 3. [Modèle MongoDB](#3-modèle-mongodb)
@@ -183,9 +186,6 @@ Pour analyser le réseau, l'intégralité du dataset de MongoDB est migré vers 
 
 *Contraintes métiers implémentées via APOC/Cypher (`CREATE CONSTRAINT user_id_unique...`)*.
 
-![Neo4j Graph Schema](screenshots/04_neo4j_schema.png)
-*Schéma métadonné extraite des noeuds et relations sous Neo4j Browser*
-
 ---
 
 ## 5. Implémentation Python
@@ -215,9 +215,6 @@ L'architecture applicative est construite autour de principes de *Clean Architec
  ┗ 📜 visualizations.py    # Pyvis, Seaborn & Pandas pour génération de graphiques locaux
 ```
 
-![Python Architecture](screenshots/05_python_architecture.png)
-*Représentation hiérarchique du diagramme d'appels entre les scripts*
-
 ---
 
 ## 6. Analyses et Requêtes
@@ -227,7 +224,7 @@ Chaque requête tire parti des forces respectives des deux moteurs : MongoDB pou
 ![KPI Numbers](screenshots/KPI_numbers.png)
 *Aperçu global des indicateurs clés (KPIs) extraits en temps réel des bases NoSQL.*
 
-### ▶️ Requêtes MongoDB
+### Requêtes MongoDB
 *Les codes proviennent tous nativement du fichier `services_mongo.py` de l'application.*
 
 **Q1 - Nombre total d'utilisateurs**
@@ -327,7 +324,7 @@ def get_top_10_hashtags(self) -> List[dict]:
 *Résultat de la requête Q13 dans l'API/CLI.*
 
 
-### ▶️ Requêtes Neo4j (Cypher)
+### Requêtes Neo4j (Cypher)
 *Extraits exécutés dynamiquement via la classe client `services_neo4j.py` à l'aide des bindings Python neo4j.*
 
 **Q7 - Followers du compte officiel ("MilanoOps")**
@@ -439,9 +436,7 @@ L'application expose ses analyses visuellement via plusieurs librairies. La couc
 
 | Objectif | Image Générée | Interprétation Analytique |
 |:---|:---:|:---|
-| **Réseau de l'Administrateur (Ego Network Neo4j)** | ![MilanoOps Ego Network Placeholder](screenshots/milano_ops_ego_network.png) | Le graphe montre un rayonnement "en étoile" depuis le compte de modération. L'administrateur génère beaucoup de communication à l'aller et reçoit proportionnellement de l'information centralisée très spécifique. |
 | **Topologie Sociale (Roles)** | ![Roles Distribution Placeholder](screenshots/user_roles.png) | Réalisé au moyen de Seaborn. L'équilibre probabiliste a été implémenté en Python pour s'assurer que les rôles `staff`, `journaliste`, `bénévole`, et `fan` soient statistiquement cohérents. |
-| **Distribution des Trends (Mongo)** | ![Top 10 Hashtags Placeholder](screenshots/top_10_hashtags.png) | Le hashtag d'intérêt `#milano2026` cannibalise logiquement la part d'usage sur la plateforme et permet donc une observation virale optimale. |
 
 *(Note : les images au-dessus sont compilées automatiquement via l'exécution de `visualizations.py` intégré dans le runner).*
 
@@ -456,9 +451,6 @@ L'application expose ses analyses visuellement via plusieurs librairies. La couc
 
 ![Tweet Timeline](screenshots/timeline_des_tweets.png)
 *Progression linéaire par timestamp de la masse des publications X/Twitter.*
-
-![Neo4j MilanoOps Network](screenshots/viz_05_neo4j_graph.png)
-*Focale visuelle interactive sur les noeuds administrés (Vis.js Network).*
 
 ---
 
