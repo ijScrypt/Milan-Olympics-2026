@@ -16,13 +16,7 @@
 
 ## Demo
 
-<videocontrols>
-<sourcesrc="screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4"type="video/mp4">
-</video>
-<video src="screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4" controls width="100%">
-  Votre navigateur ne supporte pas la lecture de vidéos.
-</video>
-*Démonstration vidéo du tableau de bord Milano 2026 en direct*
+https://github.com/ijScrypt/Milan-Olympics-2026/blob/amine/screenshots/Milano%202026%20-%20Dashboard%20Nosql.mp4
 
 ---
 
