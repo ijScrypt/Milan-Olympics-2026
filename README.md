@@ -37,10 +37,8 @@ Clonez le dépôt et configurez un environnement virtuel Python :
 python -m venv venv
 
 # Activer l'environnement virtuel
-# Sous Windows :
+
 venv\Scripts\activate
-# Sous Unix ou MacOS :
-source venv/bin/activate
 ```
 
 ### 2. Installation des Dépendances
