@@ -113,7 +113,3 @@ Le frontend est construit en HTML/JS/CSS pur. Comme il s'agit d'un client autono
 *   **Moteur de Requêtes NoSQL** : Onglet dédié pour exécuter 16 requêtes analytiques spécifiques sur les deux moteurs de base de données.
 *   **Gestion CRUD** : Interface directe pour Créer, Lire, Mettre à jour et Supprimer des documents et des utilisateurs.
 
----
-<div align="center">
-  <i>Technical Readme - Projet NoSQL Milano 2026</i>
-</div>
